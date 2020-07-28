@@ -15,8 +15,8 @@ class ResponseHandler:
     for notification in self.response:
       repo_info = notification['repository']
       repo_relation = notification['reason']
-      repo_name = re.sub( r'^https:\/\/api\.github\.com\/repos\/', '',repo_info["url"])
-      notif_url = notification['url']
+      repo_name = notification['repository']['full_name']
+      notif_url = "https://api.github.com/" + repo_name
       notif_details = notification['subject']
       notif_reason = ' '.join(re.findall('[A-Z][^A-Z]*', notif_details["type"]))
       notif_date = parser.isoparse(notification["updated_at"]).replace(tzinfo=None)
@@ -47,7 +47,7 @@ class ResponseHandler:
 
   def print_result(self):
     if self.notifications == []:
-      print("No new notifications", 'red')
+      print(f"\033[1;31;40m No new notifications in sight!")
     for notification in self.notifications:
       self.pretty_print_notification(notification)
 
