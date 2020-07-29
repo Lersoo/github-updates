@@ -8,6 +8,7 @@ class ResponseHandler:
   def __init__(self, api_response):
     self.response = api_response
     self.notifications = []
+    self.now = datetime.now().replace(microsecond=0)
     self.assign_values()
     self.print_result()
 
@@ -38,9 +39,9 @@ class ResponseHandler:
       notif_reason = self.format_notification_reason(notification["reason"])
       url = f'{notification["url"]}'
       date = notification["date"]
-      now = datetime.now()
+      time_difference = self.now - date
 
-      print(f'{repo_name} - {repo_relation} - {abs(now - date)} hours ago')
+      print(f'{repo_name} - {repo_relation} - {time_difference} hours ago')
       print(f'{notif_reason} \t {notif_title}')
       print(f'{url}')
       print('----------------------------------\n')
