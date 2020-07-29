@@ -48,7 +48,7 @@ class ResponseHandler:
 
   def print_result(self):
     if self.notifications == []:
-      print("\033[1;31;40mNo new notifications")
+      print(f"\033[1;31;40m No new notifications in sight!")
     for notification in self.notifications:
       self.pretty_print_notification(notification)
 
