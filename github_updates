@@ -1,13 +1,41 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
 
-SCRIPT_LOCATION=$(readlink -f $0)
-FOLDER=$(dirname $SCRIPT_LOCATION)
-GITHUB_USERNAME=$(grep GITHUB_USERNAME $FOLDER/.env | cut -d '=' -f2)
-GITHUB_BEARER_TOKEN=$(grep GITHUB_BEARER_TOKEN $FOLDER/.env | cut -d '=' -f2)
+import requests, sys, os, argparse, json;
+from time import sleep;
+from response_handler import ResponseHandler
+from config_generator import ConfigGenerator
 
-PYTHON_SCRIPT=$FOLDER/response_handler.py
+os.system('clear')
 
-query_response=$(curl -s -u $GITHUB_USERNAME:$GITHUB_BEARER_TOKEN https://api.github.com/notifications)
+def check_config_and_launch(config):
+  username = config['github_username']
+  bearer_token  = config['github_bearer_token']
+  response = requests.get("https://api.github.com/notifications", auth=(username, bearer_token)).json()
+  if isinstance(response, dict):
+    if 'Bad credentials' in response.values():
+      print("Wrong credentials, starting config.")
+      sleep(1)
+      ConfigGenerator()
+  else:
+    show_security_updates = config['max_nb_notifications'] == "Y"
+    max_nb  = int(config['max_nb_notifications'])
+    ResponseHandler(api_response = response, max_nb = max_nb, show_security_updates = show_security_updates)
 
-python3 $PYTHON_SCRIPT $query_response
+def config():
+    ConfigGenerator()
 
+def main():
+  config = json.load(open('./config.json'))
+  check_config_and_launch(config)
+
+if not len(sys.argv) > 1:
+  if os.path.exists("config.json"):
+    main()
+  else:
+    ConfigGenerator()
+    # os.system('clear')
+    main()
+else:
+  parser = argparse.ArgumentParser()
+  parser.add_argument("-c", "--config", nargs='?', const=config(), help="Launch config",)
+  args = parser.parse_args()
