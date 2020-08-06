@@ -1,8 +1,8 @@
 # What's github-updates ?
 
-It's nothing yet, but it will soon be.
-Github's notifications system is pretty bad in my opinion.
-I just want a simple, human-readable overview of everything that happened on every repo I'm a contributor of, when I'm launching my terminal or when entering a command. Simple !
+Github's notifications system is pretty bad, in my opinion.
+
+Where do developers work (most of the time) ? In their terminal. So why not display those notifications there ?
 
 ### How I plan to do it
 
