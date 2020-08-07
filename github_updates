@@ -7,26 +7,25 @@ from config_generator import ConfigGenerator
 
 os.system('clear')
 
-def check_config_and_launch(config):
-  username = config['github_username']
-  bearer_token  = config['github_bearer_token']
-  response = requests.get("https://api.github.com/notifications", auth=(username, bearer_token)).json()
-  if isinstance(response, dict):
-    if 'Bad credentials' in response.values():
-      print("Wrong credentials, starting config.")
-      sleep(1)
-      ConfigGenerator()
-  else:
-    show_security_updates = config['max_nb_notifications'] == "Y"
-    max_nb  = int(config['max_nb_notifications'])
-    ResponseHandler(api_response = response, max_nb = max_nb, show_security_updates = show_security_updates)
+def check_config():
+  req = requests.get("https://api.github.com/notifications", auth=(self.current_config.get('github_username'), self.current_config.get('github_bearer_token'))).json()
+
 
 def config():
     ConfigGenerator()
 
 def main():
   config = json.load(open('./config.json'))
-  check_config_and_launch(config)
+  if any(value == '' for value in config.values()):
+    ConfigGenerator()
+  else:
+    response = requests.get("https://api.github.com/notifications", auth=(config['github_username'], config['github_bearer_token'])).json()
+    if 'Bad credentials' in response.values():
+      print("Wrong credentials, starting config.")
+      sleep(1)
+      ConfigGenerator()
+    else:
+      ResponseHandler(api_response = response, max_nb = int(config['max_nb_notifications']))
 
 if not len(sys.argv) > 1:
   if os.path.exists("config.json"):

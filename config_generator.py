@@ -1,6 +1,5 @@
 import os, json, requests;
 from time import sleep;
-from response_handler import ResponseHandler
 
 class ConfigGenerator:
   def __init__(self):
@@ -8,10 +7,12 @@ class ConfigGenerator:
       os.system('touch config.json')
       os.system('echo "{}" >> config.json')
 
-    self.load_json()
-
+    jsonFile = open("config.json", "r")
+    self.current_config = json.load(jsonFile)
+    jsonFile.close()
+    self.current_config = json.load(open('./config.json'))
     self.set_config()
-    self.check_config_and_launch()
+    self.check_config()
 
   def set_config(self):
     config = {
