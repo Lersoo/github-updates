@@ -25,9 +25,10 @@ class ResponseHandler:
 
   FORMATS  = ['normal', 'bold', 'light', 'italic', 'underline', 'slow_blink', 'rapid_blink']
 
-  def __init__(self, api_response, max_nb = 10):
+  def __init__(self, api_response, max_nb = 10, show_security_updates = True):
     self.response = api_response
     self.max_nb = max_nb
+    self.show_security_updates = show_security_updates
     self.notifications = []
     self.now = datetime.now().replace(second=0, microsecond=0, minute=0)
     self.assign_values()
@@ -50,7 +51,11 @@ class ResponseHandler:
         "url": notif_url,
         "date": notif_date
       }
-      self.notifications.append(notif_object) if notif_object["relation"] != "security_alert" else None;
+      if not self.show_security_updates:
+        self.notifications.append(notif_object) if notif_object["relation"] != "security_alert" else None;
+      else:
+        self.notifications.append(notif_object)
+
   def extract_url(self, notification):
     notification_detail = notification['subject']['url'].split('repos', 1)[1]
     return 'https://github.com' + notification_detail.replace('pulls', 'pull')
