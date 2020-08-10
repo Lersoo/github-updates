@@ -1,5 +1,6 @@
 import os, json, requests;
 from time import sleep;
+from response_handler import ResponseHandler
 
 class ConfigGenerator:
   def __init__(self):
@@ -12,7 +13,7 @@ class ConfigGenerator:
     jsonFile.close()
     self.current_config = json.load(open('./config.json'))
     self.set_config()
-    self.check_config()
+    self.check_config_and_launch()
 
   def set_config(self):
     config = {
@@ -62,11 +63,10 @@ class ConfigGenerator:
   def check_config_and_launch(self):
     self.load_json()
     response = requests.get("https://api.github.com/notifications", auth=(self.current_config['github_username'], self.current_config['github_bearer_token'])).json()
-    if isinstance(response, dict):
-      if 'Bad credentials' in response.values():
-        print("Wrong credentials, starting config.")
-        sleep(1)
-        ConfigGenerator()
+    if isinstance(response, dict) and 'Bad credentials' in response.values():
+      print("Wrong credentials, starting config.")
+      sleep(1)
+      ConfigGenerator()
     else:
       show_security_updates = self.current_config['max_nb_notifications'] == "Y"
       max_nb  = int(self.current_config['max_nb_notifications'])
