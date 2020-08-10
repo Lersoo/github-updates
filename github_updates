@@ -20,19 +20,20 @@ def main():
     ConfigGenerator()
   else:
     response = requests.get("https://api.github.com/notifications", auth=(config['github_username'], config['github_bearer_token'])).json()
-    if 'Bad credentials' in response.values():
+    if isinstance(response, dict) and 'Bad credentials' in response.values():
       print("Wrong credentials, starting config.")
       sleep(1)
       ConfigGenerator()
     else:
-      ResponseHandler(api_response = response, max_nb = int(config['max_nb_notifications']))
+      show_security_updates = config['max_nb_notifications'] == "Y"
+      max_nb  = int(config['max_nb_notifications'])
+      ResponseHandler(api_response = response, max_nb = max_nb, show_security_updates = show_security_updates)
 
 if not len(sys.argv) > 1:
   if os.path.exists("config.json"):
     main()
   else:
     ConfigGenerator()
-    # os.system('clear')
     main()
 else:
   parser = argparse.ArgumentParser()
